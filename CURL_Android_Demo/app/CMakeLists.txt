@@ -23,7 +23,8 @@ add_library( # Specifies the target library.
 
              # Provides the path to the library you want to import.
              src/main/cpp/mxcurl.cpp
-             src/main/cpp/lchttp.cpp )
+             src/main/cpp/lchttp.cpp
+             src/main/cpp/mxerror.cpp )
 
 # =============== 添加头文件 ===============
 target_include_directories(mxcurl PRIVATE

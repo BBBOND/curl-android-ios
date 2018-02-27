@@ -8,7 +8,7 @@ struct lchttp_error_t {
 };
 
 struct lchttp_response_t {
-    long code;
+    int code;
     char *header;
     char *text;
 };
