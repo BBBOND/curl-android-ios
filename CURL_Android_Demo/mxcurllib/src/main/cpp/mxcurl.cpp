@@ -42,6 +42,7 @@ JNIEnv *JNU_GetEnv() {
     return env;
 }
 
+extern "C"
 JNIEXPORT jint JNICALL
 JNI_OnLoad(JavaVM *jvm, void *reserved) {
     JNIEnv *env;
@@ -105,28 +106,28 @@ class Holder {
 
     void cleanGlobalRefs() {
         JNIEnv *env = JNU_GetEnv();
-        LOGV("clean java global refs");
+//        LOGV("clean java global refs");
         while (!m_j_global_refs.empty()) {
             jobject ref = m_j_global_refs.front();
-            LOGV(".");
+//            LOGV(".");
             env->DeleteGlobalRef(ref);
             m_j_global_refs.pop_front();
         }
 
-        LOGV("clean java global ref strings");
+//        LOGV("clean java global ref strings");
         while (!m_string_refs.empty()) {
             jobject_str_t *ref = m_string_refs.front();
-            LOGV(".");
+//            LOGV(".");
             env->ReleaseStringUTFChars((jstring) ref->obj, (const char *) ref->str);
             env->DeleteGlobalRef(ref->obj);
             free(ref);
             m_string_refs.pop_front();
         }
 
-        LOGV("clean java global ref byteArrays");
+//        LOGV("clean java global ref byteArrays");
         while (!m_byte_array_refs.empty()) {
             jobject_str_t *ref = m_byte_array_refs.front();
-            LOGV(".");
+//            LOGV(".");
             env->ReleaseByteArrayElements((jbyteArray) ref->obj, (jbyte *) ref->str, 0);
             env->DeleteGlobalRef(ref->obj);
             free(ref);
@@ -135,10 +136,10 @@ class Holder {
     }
 
     void cleanSlists() {
-        LOGV("clean curl slists");
+//        LOGV("clean curl slists");
         while (!m_slists.empty()) {
             struct curl_slist *slist = m_slists.front();
-            LOGV(".");
+//            LOGV(".");
             curl_slist_free_all(slist);
             m_slists.pop_front();
         }
@@ -158,7 +159,7 @@ public:
         cleanSlists();
 
         if (m_post != NULL) {
-            LOGD("clean post form");
+//            LOGD("clean post form");
             curl_formfree(m_post);
             m_post = NULL;
         }
@@ -206,19 +207,20 @@ public:
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_com_bbbond_mxcurllib_Curl_curlGetVersion(JNIEnv *env, jclass type) {
+Java_com_bbbond_mxcurllib_Curl_curlGetVersion(JNIEnv *env, jobject type) {
 
     char *version = curl_version();
     return env->NewStringUTF(version);
 }
 
+extern "C"
 JNIEXPORT jint JNICALL
 Java_com_bbbond_mxcurllib_Curl_curlGlobalInitNative(
         JNIEnv *env,
         jclass type,
         jint flags
 ) {
-    curl_global_init((int) flags);
+    return curl_global_init((int) flags);
 }
 
 extern "C"
@@ -333,7 +335,7 @@ Java_com_bbbond_mxcurllib_Curl_curlEasySetoptFunctionNative(
     jobject cb_ref = 0;
     switch (opt) {
         case CURLOPT_HEADERFUNCTION:
-            LOGV("setopt CURLOPT_HEADERFUNCTION");
+//            LOGV("setopt CURLOPT_HEADERFUNCTION");
             curl_easy_setopt(curl, (CURLoption) opt, &write_callback);
             cb_ref = env->NewGlobalRef(callback);
             holder->addGlobalRefs(cb_ref);
@@ -451,12 +453,12 @@ Java_com_bbbond_mxcurllib_Curl_curlEasySetoptObjectPointArrayNative(
         if (str == 0) {
             return 0;
         }
-        LOGV("append slist");
+//        LOGV("append slist");
         slist = curl_slist_append(slist, str);
         env->ReleaseStringUTFChars(value, str);
     }
     holder->addCurlSlist(slist);
-    LOGD("set slist option=%d, size=%d", opt, nargs);
+//    LOGD("set slist option=%d, size=%d", opt, nargs);
     return curl_easy_setopt(curl, (CURLoption) opt, slist);
 }
 
@@ -478,7 +480,7 @@ Java_com_bbbond_mxcurllib_Curl_setFormdataNative(
     struct curl_httppost *last = NULL;
     // clear all
     if (post != NULL) {
-        LOGD("clear previous form.");
+//        LOGD("clear previous form.");
         curl_formfree(post);
         post = NULL;
     }
@@ -486,9 +488,9 @@ Java_com_bbbond_mxcurllib_Curl_setFormdataNative(
     if (multi_array != NULL) {
         CURLFORMcode code;
         int len = env->GetArrayLength(multi_array);
-        LOGD("set name/parts size=%d", len);
+//        LOGD("set name/parts size=%d", len);
         for (int i = 0; i < len; i++) {
-            LOGV(".");
+//            LOGV(".");
             jobject part = env->GetObjectArrayElement(multi_array, i);
             jstring name = (jstring) env->CallObjectMethod(part, MID_MultiPart_get_name);
             jstring filename = (jstring) env->CallObjectMethod(part, MID_MultiPart_get_filename);
@@ -557,7 +559,7 @@ Java_com_bbbond_mxcurllib_Curl_setFormdataNative(
     }
 
     if (post != NULL) {
-        LOGV("set_opt CURLOPT_HTTPPOST");
+//        LOGV("set_opt CURLOPT_HTTPPOST");
         holder->setPost(post);
         return curl_easy_setopt(curl, CURLOPT_HTTPPOST, post);
     }

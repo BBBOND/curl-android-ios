@@ -35,6 +35,7 @@ android {
         main {
             // let gradle pack the shared library into apk
             jniLibs.srcDirs = ['../../prebuilt-with-ssl/android']
+            jni.srcDirs = ['src/main/cpp']
         }
     }
 

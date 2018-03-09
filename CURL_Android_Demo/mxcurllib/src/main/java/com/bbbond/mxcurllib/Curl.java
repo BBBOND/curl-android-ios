@@ -21,12 +21,40 @@ public class Curl {
   private static final String TAG = Curl.class.getSimpleName();
 
   private long handle;
+  private static boolean INIT = false;
+
+  static {
+    System.loadLibrary("mxcurl");
+  }
+
+  private native static String curlGetVersion();
+
+  private native static int curlGlobalInitNative(int flags);
+
+  private native static void curlGlobalCleanupNative();
+
+  private native long curlEasyInitNative();
+
+  private native void curlEasyCleanupNative(long handle);
+
+  private native int curlEasySetoptLongNative(long handle, int opt, long value);
+
+  private native int curlEasySetoptFunctionNative(long handle, int opt, Callback callback);
+
+  private native int curlEasySetoptObjectPointNative(long handle, int opt, String value);
+
+  private native int curlEasySetoptObjectPointBytesNative(long handle, int opt, byte[] value);
+
+  private native int curlEasySetoptObjectPointArrayNative(long handle, int opt, String[] value);
+
+  private native int setFormdataNative(long handle, MultiPart[] multiArray);
+
+  private native int curlEasyPerformNavite(long handle);
 
   public interface Callback {
   }
 
   private static Object CLEANUP = new Object() {
-
     @Override
     protected void finalize() throws Throwable {
       if (INIT) {
@@ -37,13 +65,11 @@ public class Curl {
 
   };
 
-  private native static String curlGetVersion();
 
   public String curlVersion() {
     return curlGetVersion();
   }
 
-  private static boolean INIT = false;
 
   public interface WriteCallback extends Callback {
     /**
@@ -86,19 +112,13 @@ public class Curl {
     INIT = true;
   }
 
-  private native static int curlGlobalInitNative(int flags);
-
-  private native static void curlGlobalCleanupNative();
-
   public void curlEasyInit() throws CurlException {
-    Log.v(TAG, "curlEastInit");
+//    Log.v(TAG, "curlEastInit");
     handle = curlEasyInitNative();
     if (handle == 0) {
       throw new CurlException("curl init native fail");
     }
   }
-
-  private native long curlEasyInitNative();
 
   public void curlEasyCleanup() {
     Log.v(TAG, "curlEastCleanup: " + handle);
@@ -108,47 +128,35 @@ public class Curl {
     handle = 0;
   }
 
-  private native void curlEasyCleanupNative(long handle);
-
   /**
    * @param opt   {@link CurlOpt.OptLong}
    * @param value
    * @return
    */
   public CurlCode curlEasySetopt(CurlOpt.OptLong opt, long value) {
-    Log.v(TAG, "curlEastSetopt: " + opt + "=" + value);
+//    Log.v(TAG, "curlEastSetopt: " + opt + "=" + value);
     return CurlCode.fromValue(curlEasySetoptLongNative(handle, opt.getValue(), value));
   }
 
-  private native int curlEasySetoptLongNative(long handle, int opt, long value);
-
   public CurlCode curlEasySetopt(CurlOpt.OptFunctionPoint opt, WriteCallback callback) {
-    Log.v(TAG, "curlEastSetopt: " + opt + "=" + callback);
+//    Log.v(TAG, "curlEastSetopt: " + opt + "=" + callback);
     return CurlCode.fromValue(curlEasySetoptFunctionNative(handle, opt.getValue(), callback));
   }
 
-  private native int curlEasySetoptFunctionNative(long handle, int opt, Callback callback);
-
   public CurlCode curlEasySetopt(CurlOpt.OptObjectPoint opt, String value) {
-    Log.v(TAG, "curlEastSetopt: " + opt + "=" + value);
+//    Log.v(TAG, "curlEastSetopt: " + opt + "=" + value);
     return CurlCode.fromValue(curlEasySetoptObjectPointNative(handle, opt.getValue(), value));
   }
 
-  private native int curlEasySetoptObjectPointNative(long handle, int opt, String value);
-
   public CurlCode curlEasySetopt(CurlOpt.OptObjectPoint opt, byte[] value) {
-    Log.v(TAG, "curlEastSetopt: " + opt + "=" + value);
+//    Log.v(TAG, "curlEastSetopt: " + opt + "=" + value);
     return CurlCode.fromValue(curlEasySetoptObjectPointBytesNative(handle, opt.getValue(), value));
   }
 
-  private native int curlEasySetoptObjectPointBytesNative(long handle, int opt, byte[] value);
-
   public CurlCode curlEasySetopt(CurlOpt.OptObjectPoint opt, String[] values) {
-    Log.v(TAG, "curlEastSetopt: " + opt + "=" + values);
+//    Log.v(TAG, "curlEastSetopt: " + opt + "=" + values);
     return CurlCode.fromValue(curlEasySetoptObjectPointArrayNative(handle, opt.getValue(), values));
   }
-
-  private native int curlEasySetoptObjectPointArrayNative(long handle, int opt, String[] value);
 
   /**
    * if set multiple times, previous form will be cleared!
@@ -164,16 +172,8 @@ public class Curl {
     }
   }
 
-  private native int setFormdataNative(long handle, MultiPart[] multiArray);
-
   public CurlCode curlEasyPerform() {
-    Log.v(TAG, "curlEasyPerform");
+//    Log.v(TAG, "curlEasyPerform");
     return CurlCode.fromValue(curlEasyPerformNavite(handle));
-  }
-
-  private native int curlEasyPerformNavite(long handle);
-
-  static {
-    System.loadLibrary("mxcurl");
   }
 }

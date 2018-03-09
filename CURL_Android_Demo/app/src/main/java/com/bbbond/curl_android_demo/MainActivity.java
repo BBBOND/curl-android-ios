@@ -20,7 +20,13 @@ public class MainActivity extends AppCompatActivity {
       @Override
       public void run() {
         try {
-          CurlResponse curlResponse = CurlHttp.newInstance().getUrl("http://blog.bbbond.cn/api/posts.json").perform();
+          CurlResponse curlResponse = CurlHttp
+              .newInstance()
+              .getUrl("https://www.baidu.com/")
+//              .setHttpProxy("192.168.0.133", 8888)
+              .closeSslVerify()
+              .perform();
+
           Log.d(TAG, "run: curlResponse" + curlResponse.getBodyAsString());
 
 //          String url = "http://192.168.0.133:3000";

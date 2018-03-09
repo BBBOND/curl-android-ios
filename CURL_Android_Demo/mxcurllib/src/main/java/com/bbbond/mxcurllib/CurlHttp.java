@@ -100,6 +100,12 @@ public class CurlHttp {
     return this;
   }
 
+  public CurlHttp closeSslVerify() {
+    curl.curlEasySetopt(OptLong.CURLOPT_SSL_VERIFYHOST, 0);
+    curl.curlEasySetopt(OptLong.CURLOPT_SSL_VERIFYPEER, 0);
+    return this;
+  }
+
   /**
    * @param proxy [scheme]://
    * @return
@@ -107,6 +113,7 @@ public class CurlHttp {
    */
   public CurlHttp setProxy(String proxy) {
     curl.curlEasySetopt(OptObjectPoint.CURLOPT_PROXY, proxy);
+    closeSslVerify();
     return this;
   }
 
@@ -148,6 +155,7 @@ public class CurlHttp {
   public CurlHttp setHttpProxy(String host, int port) {
     this.proxyHost = host;
     this.proxyPort = port;
+    closeSslVerify();
     return this;
   }
 
@@ -329,7 +337,7 @@ public class CurlHttp {
 
   public CurlResponse perform() throws CurlException {
     if (url == null) {
-      throw new IllegalStateException("url getUrl/postUrl not set");
+      throw new IllegalStateException("url getUrl/postUrl/url not set");
     }
 
     // - populate headers
@@ -362,7 +370,7 @@ public class CurlHttp {
           url += "?" + params;
         }
 
-        logger.v("contact params to url: %s", url);
+//        logger.v("contact params to url: %s", url);
       }
     }
 
@@ -382,7 +390,7 @@ public class CurlHttp {
     // follow
     curl.curlEasySetopt(OptLong.CURLOPT_FOLLOWLOCATION, followLocation ? 1 : 0);
     if (followLocation) {
-      Log.d(TAG, "set FOLLOWLOCATION: " + maxRedirects);
+//      Log.d(TAG, "set FOLLOWLOCATION: " + maxRedirects);
       curl.curlEasySetopt(OptLong.CURLOPT_MAXREDIRS, maxRedirects);
     }
 
@@ -396,9 +404,9 @@ public class CurlHttp {
         throw new CurlException(code);
       }
 
-      for (Map.Entry<String, String> entry : resultHeaderMap.entrySet()) {
-        Log.d(TAG, "Header: " + entry.getKey() + ": " + entry.getValue());
-      }
+//      for (Map.Entry<String, String> entry : resultHeaderMap.entrySet()) {
+//        Log.d(TAG, "Header: " + entry.getKey() + ": " + entry.getValue());
+//      }
 
       // - read response
 
@@ -416,10 +424,10 @@ public class CurlHttp {
       if (value == null) {
         value = "";
       }
-      Log.d(TAG, "header: " + entry.getKey() + " => " + value);
+//      Log.d(TAG, "header: " + entry.getKey() + " => " + value);
       headers.add(entry.getKey() + ": " + value);
     }
-    Log.d(TAG, "add hreader: " + headers.size());
+//    Log.d(TAG, "add hreader: " + headers.size());
     curl.curlEasySetopt(OptObjectPoint.CURLOPT_HTTPHEADER, headers.toArray(new String[headerMap.size()]));
   }
 
@@ -428,7 +436,7 @@ public class CurlHttp {
   }
 
   private void setPostParams() {
-    Log.d(TAG, "set post params");
+//    Log.d(TAG, "set post params");
     if (!isMultipart()) {
       // simple form
       // user provided body
@@ -462,7 +470,7 @@ public class CurlHttp {
         }
       }
 
-      Log.d(TAG, "Set MultiPart data: " + finalList.size());
+//      Log.d(TAG, "Set MultiPart data: " + finalList.size());
       CurlFormCode result = curl.setFormdata(finalList);
       if (result != CurlFormCode.CURL_FORMADD_OK) {
         throw new RuntimeException("set formdata fail: " + result);
@@ -487,7 +495,7 @@ public class CurlHttp {
           body.append(name);
           body.append("=");
           body.append(value);
-          logger.v("Append field: %s=%s", name, value);
+//          logger.v("Append field: %s=%s", name, value);
         } catch (UnsupportedEncodingException e) {
           Log.w(TAG, "encode faile: name=" + pair.getName() + ", value=" + pair.getValue(), e);
         }
@@ -506,14 +514,14 @@ public class CurlHttp {
       }
     }
     if (proxyHost != null) {
-      Log.d(TAG, "Set http proxy: " + proxyHost + ":" + proxyPort);
+//      Log.d(TAG, "Set http proxy: " + proxyHost + ":" + proxyPort);
       curl.curlEasySetopt(OptObjectPoint.CURLOPT_PROXY, proxyHost);
       curl.curlEasySetopt(OptLong.CURLOPT_PROXYPORT, proxyPort);
     }
   }
 
   private boolean checkCurrentRequestMethod() {
-    return !"".equals(requestMethod);
+    return requestMethod != null && !"".equals(requestMethod);
   }
 }
 
