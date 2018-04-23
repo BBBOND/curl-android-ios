@@ -523,22 +523,23 @@ public class CurlHttp {
   private boolean checkCurrentRequestMethod() {
     return requestMethod != null && !"".equals(requestMethod);
   }
-}
 
-class CurlRequestMethod {
-  public static final String GET = "GET";
-  public static final String POST = "POST";
-  public static final String PUT = "PUT";
-  public static final String DELETE = "DELETE";
-  public static final String PATCH = "PATCH";
+  public static class CurlRequestMethod {
+    public static final String GET = "GET";
+    public static final String POST = "POST";
+    public static final String PUT = "PUT";
+    public static final String DELETE = "DELETE";
+    public static final String PATCH = "PATCH";
 
-  public static Set<String> METHOD_SET = new HashSet<>();
+    public static Set<String> METHOD_SET = new HashSet<>();
 
-  static {
-    METHOD_SET.add(GET);
-    METHOD_SET.add(POST);
-    METHOD_SET.add(PUT);
-    METHOD_SET.add(DELETE);
-    METHOD_SET.add(PATCH);
+    static {
+      METHOD_SET.add(GET);
+      METHOD_SET.add(POST);
+      METHOD_SET.add(PUT);
+      METHOD_SET.add(DELETE);
+      METHOD_SET.add(PATCH);
+    }
   }
 }
+
