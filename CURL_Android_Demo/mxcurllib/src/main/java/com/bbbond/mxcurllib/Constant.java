@@ -6,5 +6,5 @@ package com.bbbond.mxcurllib;
 
 public class Constant {
   public static final String LIB_NAME = "MXCURL";
-  public static final String LIB_VERSION = "0.0.1";
+  public static final String LIB_VERSION = BuildConfig.VERSION_NAME;
 }
