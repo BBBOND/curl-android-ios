@@ -4,12 +4,15 @@ android {
     compileSdkVersion 27
 
     defaultConfig {
-        minSdkVersion 18
-        targetSdkVersion 27
+        minSdkVersion 14
+        targetSdkVersion 23
         versionCode 1
         versionName "1.0"
+        project.archivesBaseName = "moxie-curl"
+        project.version = android.defaultConfig.versionName
         ndk {
-            abiFilters "armeabi", "arm64-v8a", "armeabi-v7a", "x86", "x86_64", "mips", "mips64"
+            abiFilters "armeabi", "armeabi-v7a"
+//            , "x86", "x86_64", "mips", "mips64", "arm64-v8a",
         }
         externalNativeBuild {
             cmake {
@@ -39,6 +42,29 @@ android {
         }
     }
 
+    lintOptions {
+        abortOnError false
+    }
+
+    publishNonDefault true
+    libraryVariants.all { variant ->
+        variant.outputs.all { output ->
+            def outputFile = output.outputFile
+            if (outputFile != null && outputFile.name.endsWith('.aar')) {
+                outputFileName = "${archivesBaseName}-${version}" + ".aar"
+            }
+        }
+    }
+
+//    libraryVariants.all { variant ->
+//        variant.outputs.each { output ->
+//            def outputFile = output.outputFile
+//            if (outputFile != null && outputFile.name.endsWith('.aar')) {
+//                def fileName = "${archivesBaseName}-${version}" + ".aar"
+//                output.outputFile = new File(outputFile.parent, fileName)
+//            }
+//        }
+//    }
 }
 
 dependencies {
