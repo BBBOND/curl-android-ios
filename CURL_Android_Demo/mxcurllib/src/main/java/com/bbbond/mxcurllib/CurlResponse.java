@@ -86,4 +86,17 @@ public class CurlResponse {
     }
     return bodyString;
   }
+
+  /**
+   *
+   * @param charset
+   * @return
+   * @throws IOException
+   */
+  public String getBodyAsString(String charset) throws IOException {
+    if (bodyString == null) {
+      bodyString = new String(getDecodedBody(), charset);
+    }
+    return bodyString;
+  }
 }
