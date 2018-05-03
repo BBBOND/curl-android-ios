@@ -75,6 +75,11 @@ public class CurlHttp {
     return this;
   }
 
+  public CurlHttp addHeaders(Map<String, String> headers) {
+    headerMap.putAll(headers);
+    return this;
+  }
+
   public CurlHttp setConnectionTimeoutMillis(long millis) {
     curl.curlEasySetopt(OptLong.CURLOPT_CONNECTTIMEOUT_MS, millis);
     return this;
