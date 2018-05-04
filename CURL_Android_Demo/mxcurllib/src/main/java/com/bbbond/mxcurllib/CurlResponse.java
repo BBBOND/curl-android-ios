@@ -5,6 +5,8 @@ import android.util.Log;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
@@ -13,12 +15,12 @@ public class CurlResponse {
   private static final String TAG = CurlResponse.class.getSimpleName();
   private final int status;
   private final String statusLine;
-  private final Map<String, String> headers;
+  private final Map<String, List<String>> headers;
   private final byte[] body;
   private transient String bodyString;
   private transient byte[] decodedBody;
 
-  public CurlResponse(int status, String statusLine, Map<String, String> headers, byte[] body) {
+  public CurlResponse(int status, String statusLine, Map<String, List<String>> headers, byte[] body) {
     super();
     this.status = status;
     this.statusLine = statusLine;
@@ -37,12 +39,16 @@ public class CurlResponse {
     return statusLine;
   }
 
-  public Map<String, String> getHeaders() {
+  public Map<String, List<String>> getHeaders() {
     return headers;
   }
 
-  public String getHeader(String header) {
-    return headers.get(header);
+  public List<String> getHeader(String header) {
+    List<String> headers = this.headers.get(header);
+    if (headers != null && headers.size() > 0) {
+      return headers;
+    }
+    return new ArrayList<>();
   }
 
   /**
@@ -56,7 +62,7 @@ public class CurlResponse {
    * @return decoded if body gzipped
    */
   public byte[] getDecodedBody() throws IOException {
-    if (!"gzip".equalsIgnoreCase(getHeader("Content-Encoding"))) {
+    if (getHeader("Content-Encoding").size() <= 0 || !"gzip".equalsIgnoreCase(getHeader("Content-Encoding").get(0))) {
       return body;
     }
     if (decodedBody == null) {

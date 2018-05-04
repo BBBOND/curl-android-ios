@@ -290,7 +290,7 @@ public class CurlHttp {
 
   private final Pattern STATUS_PATTERN = Pattern.compile("HTTP/\\d+\\.\\d+\\s+(\\d+)\\s+");
 
-  private void setHeaderCallback(final Map<String, String> resultMap, final AtomicInteger status, final StringBuffer statusLine) {
+  private void setHeaderCallback(final Map<String, List<String>> resultMap, final AtomicInteger status, final StringBuffer statusLine) {
     curl.curlEasySetopt(OptFunctionPoint.CURLOPT_HEADERFUNCTION, new Curl.WriteCallback() {
 
       @Override
@@ -302,7 +302,15 @@ public class CurlHttp {
         if (!StringUtils.isBlank(header)) {
           String[] nameAndValue = StringUtils.split(header, ":", 2);
           if (nameAndValue.length == 2) {
-            resultMap.put(nameAndValue[0].trim(), nameAndValue[1].trim());
+            String key = nameAndValue[0].trim();
+            String value = nameAndValue[1].trim();
+            if (resultMap.get(key) != null) {
+              resultMap.get(key).add(value);
+            } else {
+              List<String> values = new ArrayList<>();
+              values.add(value);
+              resultMap.put(key, values);
+            }
           } else if (nameAndValue.length == 1) {
             Log.i(TAG, "header: " + nameAndValue[0]);
             Matcher m = STATUS_PATTERN.matcher(nameAndValue[0]);
@@ -351,7 +359,7 @@ public class CurlHttp {
     // - populate params
     // - set post data (if needed)
     @SuppressWarnings("unchecked")
-    Map<String, String> resultHeaderMap = new CaseInsensitiveMap<String, String>();
+    Map<String, List<String>> resultHeaderMap = new CaseInsensitiveMap<String, List<String>>();
     ByteArrayOutputStream bodyOs = new ByteArrayOutputStream();
 
     AtomicInteger status = new AtomicInteger();
