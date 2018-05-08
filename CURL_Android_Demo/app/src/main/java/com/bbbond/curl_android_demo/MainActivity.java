@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
           CurlResponse curlResponse = CurlHttp
               .newInstance()
               .getUrl("https://www.baidu.com/")
-//              .setHttpProxy("192.168.0.133", 8888)
+              .useSystemProxy(false)
               .closeSslVerify()
               .perform();
 
